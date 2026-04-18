@@ -6,93 +6,127 @@
     <title>Jiu Jitsu Hoops</title>
     
     <link rel="icon" type="image/png" href="logo.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
+            font-family: 'Montserrat', sans-serif;
+            background-color: #121212; /* Sleek Dark Background */
+            color: #ffffff; /* White Text */
             max-width: 400px;
             margin: 0 auto;
             padding: 20px;
             text-align: center;
         }
-        h1 { color: #d9534f; }
+        h1 { color: #d9534f; text-transform: uppercase; letter-spacing: 1px;}
+        
         input {
-            padding: 10px;
+            padding: 12px;
             width: 70%;
             margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            background-color: #2a2a2a; /* Dark gray input */
+            color: white;
+            border: 1px solid #444;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
         }
+        input:focus { outline: none; border-color: #d9534f; } /* Red border when typing */
+        
         button {
-            padding: 10px 15px;
+            padding: 12px 18px;
             background-color: #d9534f;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
+            font-family: 'Montserrat', sans-serif;
+            transition: background-color 0.2s; /* Smooth color change on hover */
         }
         button:hover { background-color: #c9302c; }
+        
         .generate-btn {
-            background-color: #333;
+            background-color: #ffffff;
+            color: #121212;
             width: 100%;
             margin-top: 20px;
             font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .generate-btn:hover { background-color: #000; }
+        .generate-btn:hover { background-color: #e0e0e0; }
+        
         ul {
             list-style-type: none;
             padding: 0;
             text-align: left;
         }
         li {
-            background: #fff;
-            margin: 5px 0;
-            padding: 10px;
-            border-radius: 5px;
+            background: #1e1e1e; /* Slightly lighter dark gray for list items */
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 8px;
             border-left: 5px solid #d9534f;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); /* Subtle drop shadow */
         }
+        
         .delete-btn {
             background: none;
-            color: #999;
-            padding: 0;
-            font-size: 14px;
+            color: #777;
+            padding: 5px;
+            font-size: 16px;
         }
+        .delete-btn:hover { color: #d9534f; background: none; }
+        
         .teams-container {
             display: flex;
             justify-content: space-between;
-            margin-top: 20px;
+            margin-top: 25px;
         }
         .team {
             width: 48%;
-            background: white;
+            background: #1e1e1e;
             padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
-        .team h3 { margin-top: 0; color: #333; border-bottom: 2px solid #d9534f; padding-bottom: 5px;}
+        .team h3 { 
+            margin-top: 0; 
+            color: #ffffff; 
+            border-bottom: 2px solid #d9534f; 
+            padding-bottom: 8px;
+        }
         
         /* Bench Styling */
         .bench-container {
-            margin-top: 20px;
-            background: white;
+            margin-top: 25px;
+            background: #1e1e1e;
             padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            display: none; /* Hidden until needed */
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            display: none;
         }
         .bench-container h3 { 
             margin-top: 0; 
-            color: #333; 
+            color: #ffffff; 
             border-bottom: 2px solid #f0ad4e; 
-            padding-bottom: 5px;
+            padding-bottom: 8px;
         }
         .bench-container li {
             border-left: 5px solid #f0ad4e; 
+        }
+
+        /* The Animation Code */
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in {
+            animation: slideUpFade 0.5s ease-out forwards;
         }
     </style>
 </head>
@@ -151,7 +185,7 @@
             const list = document.getElementById('playerList');
             list.innerHTML = '';
             players.forEach((player, index) => {
-                list.innerHTML += `<li>${player} <button class="delete-btn" onclick="removePlayer(${index})">X</button></li>`;
+                list.innerHTML += `<li>${player} <button class="delete-btn" onclick="removePlayer(${index})">✕</button></li>`;
             });
         }
 
@@ -168,7 +202,6 @@
                 return;
             }
 
-            // Copy and shuffle the array
             let shuffledPlayers = [...players];
             shuffleArray(shuffledPlayers);
 
@@ -176,7 +209,6 @@
             let team2 = [];
             let bench = [];
 
-            // Max 5 players per team. The rest go to the bench.
             if (shuffledPlayers.length <= 10) {
                 const half = Math.ceil(shuffledPlayers.length / 2);
                 team1 = shuffledPlayers.slice(0, half);
@@ -187,9 +219,18 @@
                 bench = shuffledPlayers.slice(10);
             }
 
-            // Display results
-            document.getElementById('teamsResult').style.display = 'flex';
+            const teamsResult = document.getElementById('teamsResult');
             const benchDiv = document.getElementById('benchDiv');
+            
+            // Remove animation class briefly to allow it to restart if clicked multiple times
+            teamsResult.classList.remove('animate-in');
+            benchDiv.classList.remove('animate-in');
+
+            teamsResult.style.display = 'flex';
+            
+            // Re-add animation class
+            void teamsResult.offsetWidth; // This forces the browser to restart the animation
+            teamsResult.classList.add('animate-in');
             
             const t1List = document.getElementById('team1List');
             const t2List = document.getElementById('team2List');
@@ -202,9 +243,10 @@
             team1.forEach(p => t1List.innerHTML += `<li>${p}</li>`);
             team2.forEach(p => t2List.innerHTML += `<li>${p}</li>`);
 
-            // Show or hide the bench depending on if there are extra players
             if (bench.length > 0) {
                 benchDiv.style.display = 'block';
+                void benchDiv.offsetWidth; 
+                benchDiv.classList.add('animate-in');
                 bench.forEach(p => bList.innerHTML += `<li>${p}</li>`);
             } else {
                 benchDiv.style.display = 'none';

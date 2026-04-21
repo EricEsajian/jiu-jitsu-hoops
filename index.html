@@ -17,6 +17,7 @@
             margin: 0 auto;
             padding: 20px;
             text-align: center;
+            transition: background-color 0.3s ease;
         }
         h1 { color: #d9534f; text-transform: uppercase; letter-spacing: 1px;}
         
@@ -57,11 +58,11 @@
         .generate-btn:hover { background-color: #e0e0e0; }
 
         .share-btn {
-            background-color: #007bff; /* Blue for sharing */
+            background-color: #007bff; 
             width: 100%;
             margin-top: 15px;
             font-size: 16px;
-            display: none; /* Hidden until teams are made */
+            display: none; 
         }
         .share-btn:hover { background-color: #0056b3; }
         
@@ -125,33 +126,41 @@
             font-size: 14px;
         }
 
-        /* Scoreboard Styling */
+        /* Portrait Scoreboard & Timer */
         .scoreboard-container {
-            display: none; /* Hidden until generated */
+            display: none; 
             justify-content: space-between;
+            align-items: center;
             margin-top: 25px;
             background: #1e1e1e;
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
-        .score-box {
-            width: 45%;
-        }
-        .score-box h3 { margin: 0 0 10px 0; font-size: 14px; color: #aaa;}
+        .score-box, .timer-box { width: 32%; }
+        .score-box h3, .timer-box h3 { margin: 0 0 10px 0; font-size: 12px; color: #aaa;}
         .score-number {
-            font-size: 40px;
+            font-size: 36px;
             font-weight: bold;
             margin-bottom: 10px;
+            color: #fff;
+            user-select: none;
         }
-        .score-controls {
+        .timer-display {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #f0ad4e; /* Yellow timer */
+            user-select: none;
+        }
+        .score-controls, .timer-controls {
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 5px;
         }
         .score-btn {
-            padding: 8px 15px;
-            font-size: 18px;
+            padding: 8px 12px;
+            font-size: 16px;
             border-radius: 5px;
             background-color: #333;
         }
@@ -171,20 +180,63 @@
             color: #888;
             letter-spacing: 0.5px;
         }
+
+        /* ========================================= */
+        /* 📱 LANDSCAPE "PRO SCOREBOARD" MODE 📱 */
+        /* ========================================= */
+        @media screen and (orientation: landscape) and (max-height: 600px) {
+            /* Hide EVERYTHING except the scoreboard */
+            .hide-in-landscape { display: none !important; }
+            
+            body {
+                padding: 0;
+                margin: 0;
+                background-color: #000000; /* Pitch black gym look */
+                overflow: hidden; /* Prevent scrolling */
+            }
+
+            .scoreboard-container {
+                display: flex !important; /* Force it to show even if teams aren't generated yet */
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                margin: 0;
+                padding: 20px 40px;
+                border-radius: 0;
+                background-color: #000000;
+                box-sizing: border-box;
+                z-index: 9999;
+            }
+
+            .score-box, .timer-box { width: 33%; }
+            
+            /* Make text massive */
+            .score-number { font-size: 35vh; cursor: pointer; margin: 0; }
+            .timer-display { font-size: 25vh; cursor: pointer; margin: 0; }
+            .score-box h3, .timer-box h3 { font-size: 6vh; color: #ffffff; letter-spacing: 2px;}
+
+            /* Hide all the tiny buttons, rely on tap-to-score */
+            .score-controls, .timer-controls { display: none !important; }
+        }
     </style>
 </head>
 <body>
 
-    <h1>🥋 Jiu Jitsu Hoops 🏀</h1>
+    <!-- Everything with class="hide-in-landscape" disappears when turned sideways -->
+    <h1 class="hide-in-landscape">🥋 Jiu Jitsu Hoops 🏀</h1>
     
-    <input type="text" id="playerName" placeholder="Enter player name" onkeypress="handleKeyPress(event)">
-    <button onclick="addPlayer()">Add</button>
+    <div class="hide-in-landscape">
+        <input type="text" id="playerName" placeholder="Enter player name" onkeypress="handleKeyPress(event)">
+        <button onclick="addPlayer()">Add</button>
+    </div>
 
-    <ul id="playerList"></ul>
+    <ul id="playerList" class="hide-in-landscape"></ul>
 
-    <button class="generate-btn" onclick="generateTeams()">Generate Teams</button>
+    <button class="generate-btn hide-in-landscape" onclick="generateTeams()">Generate Teams</button>
 
-    <div class="teams-container" id="teamsResult" style="display: none;">
+    <div class="teams-container hide-in-landscape" id="teamsResult" style="display: none;">
         <div class="team" id="team1">
             <h3>⭐ Team 1</h3>
             <ul id="team1List"></ul>
@@ -203,20 +255,33 @@
         </div>
     </div>
 
-    <button id="shareBtn" class="share-btn" onclick="shareTeams()">📤 Share Teams to Chat</button>
+    <button id="shareBtn" class="share-btn hide-in-landscape" onclick="shareTeams()">📤 Share Teams to Chat</button>
 
+    <!-- The Scoreboard -->
     <div class="scoreboard-container" id="scoreboardDiv">
         <div class="score-box">
-            <h3>TEAM 1 SCORE</h3>
-            <div class="score-number" id="score1Display">0</div>
+            <h3>TEAM 1</h3>
+            <!-- Tapping the number in landscape mode adds 1 -->
+            <div class="score-number" id="score1Display" onclick="updateScore(1, 1)">0</div>
             <div class="score-controls">
                 <button class="score-btn" onclick="updateScore(1, -1)">-</button>
                 <button class="score-btn" style="background-color: #5cb85c;" onclick="updateScore(1, 1)">+</button>
             </div>
         </div>
+
+        <div class="timer-box">
+            <h3 class="hide-in-landscape">CLOCK</h3>
+            <!-- Tapping the clock in landscape mode plays/pauses -->
+            <div class="timer-display" id="timerDisplay" onclick="toggleTimer()">00:00</div>
+            <div class="timer-controls">
+                <button class="score-btn" id="timerBtn" onclick="toggleTimer()">▶️</button>
+                <button class="score-btn" onclick="resetTimer()">🔄</button>
+            </div>
+        </div>
+
         <div class="score-box">
-            <h3>TEAM 2 SCORE</h3>
-            <div class="score-number" id="score2Display">0</div>
+            <h3>TEAM 2</h3>
+            <div class="score-number" id="score2Display" onclick="updateScore(2, 1)">0</div>
             <div class="score-controls">
                 <button class="score-btn" onclick="updateScore(2, -1)">-</button>
                 <button class="score-btn" style="background-color: #5cb85c;" onclick="updateScore(2, 1)">+</button>
@@ -224,18 +289,20 @@
         </div>
     </div>
 
-    <div class="footer">
+    <div class="footer hide-in-landscape">
         Website Made With ♥️ by Quantum Prophet AI
     </div>
 
     <script>
         let players = [];
-        // Variables to store teams for sharing
         let t1Starters = [], t2Starters = [], t1Bench = [], t2Bench = [];
-        // Variables for the scoreboard
         let score1 = 0, score2 = 0;
+        
+        // Timer Variables
+        let timerInterval;
+        let seconds = 0;
+        let isTimerRunning = false;
 
-        // Auto-Load Players when the app opens
         window.onload = function() {
             const savedPlayers = localStorage.getItem('jiuJitsuHoopsRegulars');
             if (savedPlayers) {
@@ -244,7 +311,6 @@
             }
         };
 
-        // Save Players to memory
         function savePlayers() {
             localStorage.setItem('jiuJitsuHoopsRegulars', JSON.stringify(players));
         }
@@ -256,7 +322,7 @@
                 players.push(name);
                 input.value = '';
                 updatePlayerList();
-                savePlayers(); // Save every time we add
+                savePlayers(); 
             }
         }
 
@@ -269,7 +335,7 @@
         function removePlayer(index) {
             players.splice(index, 1);
             updatePlayerList();
-            savePlayers(); // Save every time we remove
+            savePlayers(); 
         }
 
         function updatePlayerList() {
@@ -287,18 +353,46 @@
             }
         }
 
-        // Scoreboard functions
+        // --- Timer Functions ---
+        function toggleTimer() {
+            if (isTimerRunning) {
+                clearInterval(timerInterval);
+                document.getElementById('timerBtn').innerText = "▶️";
+            } else {
+                timerInterval = setInterval(() => {
+                    seconds++;
+                    updateTimerDisplay();
+                }, 1000);
+                document.getElementById('timerBtn').innerText = "⏸️";
+            }
+            isTimerRunning = !isTimerRunning;
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            seconds = 0;
+            isTimerRunning = false;
+            document.getElementById('timerBtn').innerText = "▶️";
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            let m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            let s = (seconds % 60).toString().padStart(2, '0');
+            document.getElementById('timerDisplay').innerText = `${m}:${s}`;
+        }
+
+        // --- Score Functions ---
         function updateScore(team, change) {
             if (team === 1) {
-                score1 = Math.max(0, score1 + change); // Prevents negative score
+                score1 = Math.max(0, score1 + change); 
                 document.getElementById('score1Display').innerText = score1;
             } else {
-                score2 = Math.max(0, score2 + change); // Prevents negative score
+                score2 = Math.max(0, score2 + change); 
                 document.getElementById('score2Display').innerText = score2;
             }
         }
 
-        // The Share Function
         function shareTeams() {
             let text = "🏀 *Jiu Jitsu Hoops Teams* 🥋\n\n";
             text += "⭐ *Team 1:*\n" + t1Starters.join(', ') + "\n";
@@ -307,14 +401,12 @@
             text += "\n⭐ *Team 2:*\n" + t2Starters.join(', ') + "\n";
             if (t2Bench.length > 0) text += "🪑 Bench: " + t2Bench.join(', ') + "\n";
 
-            // If mobile, try to open the native share sheet
             if (navigator.share) {
                 navigator.share({
                     title: 'Jiu Jitsu Hoops Teams',
                     text: text
                 }).catch(err => console.log('Share canceled'));
             } else {
-                // If on desktop, just copy it to clipboard
                 navigator.clipboard.writeText(text).then(() => {
                     alert("Teams copied to clipboard! Paste it into your group chat.");
                 });
@@ -341,17 +433,17 @@
                 }
             });
 
-            // Update global variables so the share function can use them
             t1Starters = team1All.slice(0, 5);
             t1Bench = team1All.slice(5);
             t2Starters = team2All.slice(0, 5);
             t2Bench = team2All.slice(5);
 
-            // Reset scores for the new game
+            // Reset scores & Timer for the new game
             score1 = 0;
             score2 = 0;
             document.getElementById('score1Display').innerText = score1;
             document.getElementById('score2Display').innerText = score2;
+            resetTimer();
 
             const teamsResult = document.getElementById('teamsResult');
             const scoreboardDiv = document.getElementById('scoreboardDiv');

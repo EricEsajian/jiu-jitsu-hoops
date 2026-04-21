@@ -7,6 +7,8 @@
     
     <link rel="icon" type="image/png" href="logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
 
     <style>
         body {
@@ -295,8 +297,8 @@
         let seconds = 0;
         let isTimerRunning = false;
 
-        // --- Screen Wake Lock Variable ---
-        let wakeLock = null;
+        // Initialize NoSleep
+        var noSleep = new NoSleep();
 
         window.onload = function() {
             const savedPlayers = localStorage.getItem('jiuJitsuHoopsRegulars');
@@ -305,26 +307,6 @@
                 updatePlayerList();
             }
         };
-
-        // --- Wake Lock Functions ---
-        async function requestWakeLock() {
-            try {
-                // Only request if the browser supports it
-                if ('wakeLock' in navigator) {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                    console.log('Screen will stay awake!');
-                }
-            } catch (err) {
-                console.log(`Wake Lock error: ${err.message}`);
-            }
-        }
-
-        // Re-request wake lock if you switch tabs/apps and come back
-        document.addEventListener('visibilitychange', async () => {
-            if (wakeLock !== null && document.visibilityState === 'visible') {
-                requestWakeLock();
-            }
-        });
 
         function savePlayers() {
             localStorage.setItem('jiuJitsuHoopsRegulars', JSON.stringify(players));
@@ -432,8 +414,8 @@
                 return;
             }
 
-            // --- Keep Screen Awake when game starts ---
-            requestWakeLock();
+            // Enable NoSleep to keep the iPhone screen on!
+            noSleep.enable();
 
             let shuffledPlayers = [...players];
             shuffleArray(shuffledPlayers);

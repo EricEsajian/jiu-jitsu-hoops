@@ -85,6 +85,13 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
         }
         
+        .tier-label {
+            font-size: 12px;
+            color: #aaa;
+            margin-left: 10px;
+            font-weight: normal;
+        }
+
         .delete-btn {
             background: none;
             color: #777;
@@ -297,8 +304,23 @@
         let seconds = 0;
         let isTimerRunning = false;
 
-        // Initialize NoSleep
         var noSleep = new NoSleep();
+
+        // --- HARDCODED PLAYER TIERS ---
+        const playerTiers = {
+            "ivan": 2, "eric": 2, "justin": 1, "rudy": 2, "ruben": 1,
+            "brandon": 3, "sean": 1, "jeremy lin": 2, "brett": 1, "luther": 3,
+            "christian": 3, "jonathan": 1, "michael": 1, "somak": 2, "lance": 3,
+            "goodson": 2, "vinnie": 1, "eddie": 3, "paul sr": 3, "tom": 2,
+            "luis": 1, "tristan": 2, "zane": 2, "hr rob": 1, "pete q": 2,
+            "tyrone": 1, "alex": 3, "dave": 3
+        };
+
+        // Function to look up a player's tier
+        function getPlayerTier(name) {
+            const cleanName = name.trim().toLowerCase();
+            return playerTiers[cleanName] || 2; // Default to Tier 2 if not on the list
+        }
 
         window.onload = function() {
             const savedPlayers = localStorage.getItem('jiuJitsuHoopsRegulars');
@@ -316,10 +338,13 @@
             const input = document.getElementById('playerName');
             const name = input.value.trim();
             if (name) {
-                players.push(name);
+                // Ensure we don't add duplicates
+                if (!players.some(p => p.toLowerCase() === name.toLowerCase())) {
+                    players.push(name);
+                    updatePlayerList();
+                    savePlayers(); 
+                }
                 input.value = '';
-                updatePlayerList();
-                savePlayers(); 
             }
         }
 
@@ -339,7 +364,12 @@
             const list = document.getElementById('playerList');
             list.innerHTML = '';
             players.forEach((player, index) => {
-                list.innerHTML += `<li>${player} <button class="delete-btn" onclick="removePlayer(${index})">✕</button></li>`;
+                const tier = getPlayerTier(player);
+                // Added a span to display the tier nicely in the UI
+                list.innerHTML += `<li>
+                    <span>${player} <span class="tier-label">(Tier ${tier})</span></span> 
+                    <button class="delete-btn" onclick="removePlayer(${index})">✕</button>
+                </li>`;
             });
         }
 
@@ -414,28 +444,56 @@
                 return;
             }
 
-            // Enable NoSleep to keep the iPhone screen on!
             noSleep.enable();
 
-            let shuffledPlayers = [...players];
-            shuffleArray(shuffledPlayers);
+            // --- TIER SORTING LOGIC ---
+            let tier1 = [];
+            let tier2 = [];
+            let tier3 = [];
+
+            // Group current players by tier
+            players.forEach(p => {
+                const t = getPlayerTier(p);
+                if (t === 1) tier1.push(p);
+                else if (t === 3) tier3.push(p);
+                else tier2.push(p);
+            });
+
+            // Shuffle each tier independently to keep things random but fair
+            shuffleArray(tier1);
+            shuffleArray(tier2);
+            shuffleArray(tier3);
 
             let team1All = [];
             let team2All = [];
+            
+            // This toggle deals players back and forth like a deck of cards
+            // so one team doesn't accidentally get an extra player from every single tier.
+            let dealToTeam1 = true;
 
-            shuffledPlayers.forEach((player, index) => {
-                if (index % 2 === 0) {
-                    team1All.push(player);
-                } else {
-                    team2All.push(player);
-                }
-            });
+            const distributePlayers = (tierArray) => {
+                tierArray.forEach(p => {
+                    if (dealToTeam1) {
+                        team1All.push(p);
+                    } else {
+                        team2All.push(p);
+                    }
+                    dealToTeam1 = !dealToTeam1;
+                });
+            };
 
+            // Distribute Best to Worst
+            distributePlayers(tier1);
+            distributePlayers(tier2);
+            distributePlayers(tier3);
+
+            // Separate starters and bench
             t1Starters = team1All.slice(0, 5);
             t1Bench = team1All.slice(5);
             t2Starters = team2All.slice(0, 5);
             t2Bench = team2All.slice(5);
 
+            // Reset UI
             score1 = 0;
             score2 = 0;
             document.getElementById('score1Display').innerText = score1;

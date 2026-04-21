@@ -6,14 +6,13 @@
     <title>Jiu Jitsu Hoops</title>
     
     <link rel="icon" type="image/png" href="logo.png">
-    
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
-            background-color: #121212; /* Sleek Dark Background */
-            color: #ffffff; /* White Text */
+            background-color: #121212; 
+            color: #ffffff; 
             max-width: 400px;
             margin: 0 auto;
             padding: 20px;
@@ -25,13 +24,13 @@
             padding: 12px;
             width: 70%;
             margin-bottom: 10px;
-            background-color: #2a2a2a; /* Dark gray input */
+            background-color: #2a2a2a; 
             color: white;
             border: 1px solid #444;
             border-radius: 8px;
             font-family: 'Montserrat', sans-serif;
         }
-        input:focus { outline: none; border-color: #d9534f; } /* Red border when typing */
+        input:focus { outline: none; border-color: #d9534f; } 
         
         button {
             padding: 12px 18px;
@@ -42,7 +41,7 @@
             cursor: pointer;
             font-weight: bold;
             font-family: 'Montserrat', sans-serif;
-            transition: background-color 0.2s; /* Smooth color change on hover */
+            transition: background-color 0.2s; 
         }
         button:hover { background-color: #c9302c; }
         
@@ -56,6 +55,15 @@
             letter-spacing: 1px;
         }
         .generate-btn:hover { background-color: #e0e0e0; }
+
+        .share-btn {
+            background-color: #007bff; /* Blue for sharing */
+            width: 100%;
+            margin-top: 15px;
+            font-size: 16px;
+            display: none; /* Hidden until teams are made */
+        }
+        .share-btn:hover { background-color: #0056b3; }
         
         ul {
             list-style-type: none;
@@ -63,7 +71,7 @@
             text-align: left;
         }
         li {
-            background: #1e1e1e; /* Slightly lighter dark gray for list items */
+            background: #1e1e1e; 
             margin: 8px 0;
             padding: 12px;
             border-radius: 8px;
@@ -71,7 +79,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3); /* Subtle drop shadow */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
         }
         
         .delete-btn {
@@ -102,7 +110,6 @@
             font-size: 16px;
         }
 
-        /* In-Team Bench Styling */
         .team-bench-title {
             margin-top: 15px;
             margin-bottom: 5px;
@@ -118,7 +125,38 @@
             font-size: 14px;
         }
 
-        /* The Animation Code */
+        /* Scoreboard Styling */
+        .scoreboard-container {
+            display: none; /* Hidden until generated */
+            justify-content: space-between;
+            margin-top: 25px;
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .score-box {
+            width: 45%;
+        }
+        .score-box h3 { margin: 0 0 10px 0; font-size: 14px; color: #aaa;}
+        .score-number {
+            font-size: 40px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .score-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .score-btn {
+            padding: 8px 15px;
+            font-size: 18px;
+            border-radius: 5px;
+            background-color: #333;
+        }
+        .score-btn:hover { background-color: #555; }
+
         @keyframes slideUpFade {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -127,7 +165,6 @@
             animation: slideUpFade 0.5s ease-out forwards;
         }
 
-        /* Footer Styling */
         .footer {
             margin-top: 40px;
             font-size: 12px;
@@ -152,7 +189,7 @@
             <h3>⭐ Team 1</h3>
             <ul id="team1List"></ul>
             <div id="team1BenchDiv" style="display: none;">
-                <h4 class="team-bench-title">🪑 Bench / Next Up</h4>
+                <h4 class="team-bench-title">🪑 Bench</h4>
                 <ul id="team1BenchList" class="bench-list"></ul>
             </div>
         </div>
@@ -160,8 +197,29 @@
             <h3>⭐ Team 2</h3>
             <ul id="team2List"></ul>
             <div id="team2BenchDiv" style="display: none;">
-                <h4 class="team-bench-title">🪑 Bench / Next Up</h4>
+                <h4 class="team-bench-title">🪑 Bench</h4>
                 <ul id="team2BenchList" class="bench-list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <button id="shareBtn" class="share-btn" onclick="shareTeams()">📤 Share Teams to Chat</button>
+
+    <div class="scoreboard-container" id="scoreboardDiv">
+        <div class="score-box">
+            <h3>TEAM 1 SCORE</h3>
+            <div class="score-number" id="score1Display">0</div>
+            <div class="score-controls">
+                <button class="score-btn" onclick="updateScore(1, -1)">-</button>
+                <button class="score-btn" style="background-color: #5cb85c;" onclick="updateScore(1, 1)">+</button>
+            </div>
+        </div>
+        <div class="score-box">
+            <h3>TEAM 2 SCORE</h3>
+            <div class="score-number" id="score2Display">0</div>
+            <div class="score-controls">
+                <button class="score-btn" onclick="updateScore(2, -1)">-</button>
+                <button class="score-btn" style="background-color: #5cb85c;" onclick="updateScore(2, 1)">+</button>
             </div>
         </div>
     </div>
@@ -172,6 +230,24 @@
 
     <script>
         let players = [];
+        // Variables to store teams for sharing
+        let t1Starters = [], t2Starters = [], t1Bench = [], t2Bench = [];
+        // Variables for the scoreboard
+        let score1 = 0, score2 = 0;
+
+        // Auto-Load Players when the app opens
+        window.onload = function() {
+            const savedPlayers = localStorage.getItem('jiuJitsuHoopsRegulars');
+            if (savedPlayers) {
+                players = JSON.parse(savedPlayers);
+                updatePlayerList();
+            }
+        };
+
+        // Save Players to memory
+        function savePlayers() {
+            localStorage.setItem('jiuJitsuHoopsRegulars', JSON.stringify(players));
+        }
 
         function addPlayer() {
             const input = document.getElementById('playerName');
@@ -180,6 +256,7 @@
                 players.push(name);
                 input.value = '';
                 updatePlayerList();
+                savePlayers(); // Save every time we add
             }
         }
 
@@ -192,6 +269,7 @@
         function removePlayer(index) {
             players.splice(index, 1);
             updatePlayerList();
+            savePlayers(); // Save every time we remove
         }
 
         function updatePlayerList() {
@@ -209,6 +287,40 @@
             }
         }
 
+        // Scoreboard functions
+        function updateScore(team, change) {
+            if (team === 1) {
+                score1 = Math.max(0, score1 + change); // Prevents negative score
+                document.getElementById('score1Display').innerText = score1;
+            } else {
+                score2 = Math.max(0, score2 + change); // Prevents negative score
+                document.getElementById('score2Display').innerText = score2;
+            }
+        }
+
+        // The Share Function
+        function shareTeams() {
+            let text = "🏀 *Jiu Jitsu Hoops Teams* 🥋\n\n";
+            text += "⭐ *Team 1:*\n" + t1Starters.join(', ') + "\n";
+            if (t1Bench.length > 0) text += "🪑 Bench: " + t1Bench.join(', ') + "\n";
+            
+            text += "\n⭐ *Team 2:*\n" + t2Starters.join(', ') + "\n";
+            if (t2Bench.length > 0) text += "🪑 Bench: " + t2Bench.join(', ') + "\n";
+
+            // If mobile, try to open the native share sheet
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Jiu Jitsu Hoops Teams',
+                    text: text
+                }).catch(err => console.log('Share canceled'));
+            } else {
+                // If on desktop, just copy it to clipboard
+                navigator.clipboard.writeText(text).then(() => {
+                    alert("Teams copied to clipboard! Paste it into your group chat.");
+                });
+            }
+        }
+
         function generateTeams() {
             if (players.length < 2) {
                 alert("Add at least 2 players!");
@@ -221,7 +333,6 @@
             let team1All = [];
             let team2All = [];
 
-            // Distribute players evenly to both teams like dealing cards
             shuffledPlayers.forEach((player, index) => {
                 if (index % 2 === 0) {
                     team1All.push(player);
@@ -230,22 +341,33 @@
                 }
             });
 
-            // The first 5 go to the main roster, the rest go to the team's bench
-            let team1Starters = team1All.slice(0, 5);
-            let team1Bench = team1All.slice(5);
+            // Update global variables so the share function can use them
+            t1Starters = team1All.slice(0, 5);
+            t1Bench = team1All.slice(5);
+            t2Starters = team2All.slice(0, 5);
+            t2Bench = team2All.slice(5);
 
-            let team2Starters = team2All.slice(0, 5);
-            let team2Bench = team2All.slice(5);
+            // Reset scores for the new game
+            score1 = 0;
+            score2 = 0;
+            document.getElementById('score1Display').innerText = score1;
+            document.getElementById('score2Display').innerText = score2;
 
             const teamsResult = document.getElementById('teamsResult');
+            const scoreboardDiv = document.getElementById('scoreboardDiv');
+            const shareBtn = document.getElementById('shareBtn');
             
-            // Re-trigger animation
             teamsResult.classList.remove('animate-in');
+            scoreboardDiv.classList.remove('animate-in');
+            
             teamsResult.style.display = 'flex';
+            scoreboardDiv.style.display = 'flex';
+            shareBtn.style.display = 'block';
+
             void teamsResult.offsetWidth; 
             teamsResult.classList.add('animate-in');
+            scoreboardDiv.classList.add('animate-in');
             
-            // Get DOM elements for lists and bench divs
             const t1List = document.getElementById('team1List');
             const t2List = document.getElementById('team2List');
             const t1BenchList = document.getElementById('team1BenchList');
@@ -253,28 +375,24 @@
             const t1BenchDiv = document.getElementById('team1BenchDiv');
             const t2BenchDiv = document.getElementById('team2BenchDiv');
             
-            // Clear previous results
             t1List.innerHTML = '';
             t2List.innerHTML = '';
             t1BenchList.innerHTML = '';
             t2BenchList.innerHTML = '';
 
-            // Render Starters
-            team1Starters.forEach(p => t1List.innerHTML += `<li>${p}</li>`);
-            team2Starters.forEach(p => t2List.innerHTML += `<li>${p}</li>`);
+            t1Starters.forEach(p => t1List.innerHTML += `<li>${p}</li>`);
+            t2Starters.forEach(p => t2List.innerHTML += `<li>${p}</li>`);
 
-            // Render Team 1 Bench if they have extra players
-            if (team1Bench.length > 0) {
+            if (t1Bench.length > 0) {
                 t1BenchDiv.style.display = 'block';
-                team1Bench.forEach(p => t1BenchList.innerHTML += `<li>${p}</li>`);
+                t1Bench.forEach(p => t1BenchList.innerHTML += `<li>${p}</li>`);
             } else {
                 t1BenchDiv.style.display = 'none';
             }
 
-            // Render Team 2 Bench if they have extra players
-            if (team2Bench.length > 0) {
+            if (t2Bench.length > 0) {
                 t2BenchDiv.style.display = 'block';
-                team2Bench.forEach(p => t2BenchList.innerHTML += `<li>${p}</li>`);
+                t2Bench.forEach(p => t2BenchList.innerHTML += `<li>${p}</li>`);
             } else {
                 t2BenchDiv.style.display = 'none';
             }

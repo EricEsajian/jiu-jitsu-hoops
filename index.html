@@ -99,25 +99,23 @@
             color: #ffffff; 
             border-bottom: 2px solid #d9534f; 
             padding-bottom: 8px;
+            font-size: 16px;
         }
-        
-        /* Bench Styling */
-        .bench-container {
-            margin-top: 25px;
-            background: #1e1e1e;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            display: none;
+
+        /* In-Team Bench Styling */
+        .team-bench-title {
+            margin-top: 15px;
+            margin-bottom: 5px;
+            color: #ffffff;
+            border-bottom: 2px solid #f0ad4e;
+            padding-bottom: 5px;
+            font-size: 14px;
+            text-align: left;
         }
-        .bench-container h3 { 
-            margin-top: 0; 
-            color: #ffffff; 
-            border-bottom: 2px solid #f0ad4e; 
-            padding-bottom: 8px;
-        }
-        .bench-container li {
-            border-left: 5px solid #f0ad4e; 
+        .bench-list li {
+            border-left: 5px solid #f0ad4e;
+            padding: 10px;
+            font-size: 14px;
         }
 
         /* The Animation Code */
@@ -151,18 +149,21 @@
 
     <div class="teams-container" id="teamsResult" style="display: none;">
         <div class="team" id="team1">
-            <h3>Team 1</h3>
+            <h3>⭐ Team 1</h3>
             <ul id="team1List"></ul>
+            <div id="team1BenchDiv" style="display: none;">
+                <h4 class="team-bench-title">🪑 Bench / Next Up</h4>
+                <ul id="team1BenchList" class="bench-list"></ul>
+            </div>
         </div>
         <div class="team" id="team2">
-            <h3>Team 2</h3>
+            <h3>⭐ Team 2</h3>
             <ul id="team2List"></ul>
+            <div id="team2BenchDiv" style="display: none;">
+                <h4 class="team-bench-title">🪑 Bench / Next Up</h4>
+                <ul id="team2BenchList" class="bench-list"></ul>
+            </div>
         </div>
-    </div>
-
-    <div class="bench-container" id="benchDiv">
-        <h3>🪑 Bench / Next Up</h3>
-        <ul id="benchList"></ul>
     </div>
 
     <div class="footer">
@@ -217,51 +218,65 @@
             let shuffledPlayers = [...players];
             shuffleArray(shuffledPlayers);
 
-            let team1 = [];
-            let team2 = [];
-            let bench = [];
+            let team1All = [];
+            let team2All = [];
 
-            if (shuffledPlayers.length <= 10) {
-                const half = Math.ceil(shuffledPlayers.length / 2);
-                team1 = shuffledPlayers.slice(0, half);
-                team2 = shuffledPlayers.slice(half);
-            } else {
-                team1 = shuffledPlayers.slice(0, 5);
-                team2 = shuffledPlayers.slice(5, 10);
-                bench = shuffledPlayers.slice(10);
-            }
+            // Distribute players evenly to both teams like dealing cards
+            shuffledPlayers.forEach((player, index) => {
+                if (index % 2 === 0) {
+                    team1All.push(player);
+                } else {
+                    team2All.push(player);
+                }
+            });
+
+            // The first 5 go to the main roster, the rest go to the team's bench
+            let team1Starters = team1All.slice(0, 5);
+            let team1Bench = team1All.slice(5);
+
+            let team2Starters = team2All.slice(0, 5);
+            let team2Bench = team2All.slice(5);
 
             const teamsResult = document.getElementById('teamsResult');
-            const benchDiv = document.getElementById('benchDiv');
             
-            // Remove animation class briefly to allow it to restart if clicked multiple times
+            // Re-trigger animation
             teamsResult.classList.remove('animate-in');
-            benchDiv.classList.remove('animate-in');
-
             teamsResult.style.display = 'flex';
-            
-            // Re-add animation class
-            void teamsResult.offsetWidth; // This forces the browser to restart the animation
+            void teamsResult.offsetWidth; 
             teamsResult.classList.add('animate-in');
             
+            // Get DOM elements for lists and bench divs
             const t1List = document.getElementById('team1List');
             const t2List = document.getElementById('team2List');
-            const bList = document.getElementById('benchList');
+            const t1BenchList = document.getElementById('team1BenchList');
+            const t2BenchList = document.getElementById('team2BenchList');
+            const t1BenchDiv = document.getElementById('team1BenchDiv');
+            const t2BenchDiv = document.getElementById('team2BenchDiv');
             
+            // Clear previous results
             t1List.innerHTML = '';
             t2List.innerHTML = '';
-            bList.innerHTML = '';
+            t1BenchList.innerHTML = '';
+            t2BenchList.innerHTML = '';
 
-            team1.forEach(p => t1List.innerHTML += `<li>${p}</li>`);
-            team2.forEach(p => t2List.innerHTML += `<li>${p}</li>`);
+            // Render Starters
+            team1Starters.forEach(p => t1List.innerHTML += `<li>${p}</li>`);
+            team2Starters.forEach(p => t2List.innerHTML += `<li>${p}</li>`);
 
-            if (bench.length > 0) {
-                benchDiv.style.display = 'block';
-                void benchDiv.offsetWidth; 
-                benchDiv.classList.add('animate-in');
-                bench.forEach(p => bList.innerHTML += `<li>${p}</li>`);
+            // Render Team 1 Bench if they have extra players
+            if (team1Bench.length > 0) {
+                t1BenchDiv.style.display = 'block';
+                team1Bench.forEach(p => t1BenchList.innerHTML += `<li>${p}</li>`);
             } else {
-                benchDiv.style.display = 'none';
+                t1BenchDiv.style.display = 'none';
+            }
+
+            // Render Team 2 Bench if they have extra players
+            if (team2Bench.length > 0) {
+                t2BenchDiv.style.display = 'block';
+                team2Bench.forEach(p => t2BenchList.innerHTML += `<li>${p}</li>`);
+            } else {
+                t2BenchDiv.style.display = 'none';
             }
         }
     </script>
